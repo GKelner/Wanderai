@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WanderAI - Your Travel Companion</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #0a192f;
+            color: white;
+            font-family: Georgia, 'Times New Roman', serif;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 5.5rem;
+            margin-bottom: 2rem;
+            font-weight: normal;
+        }
+
+        p {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            margin-bottom: 3rem;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            font-size: 1.2rem;
+            background-color: white;
+            color: #0a192f;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            font-weight: bold;
+        }
+
+        .btn:hover {
+            background-color: #f0f0f0;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 255, 255, 0.3);
+        }
+
+        /* Questionnaire Styles */
+        .questionnaire {
+            display: none;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+            background-color: #0a192f;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .question {
+            margin-bottom: 2rem;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+            background-color: rgba(255, 255, 255, 0.05);
+            padding: 2rem;
+            border-radius: 8px;
+        }
+
+        .question.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .question h2 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        .question p {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            opacity: 0.9;
+            color: white;
+        }
+
+        .options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .option {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-weight: 500;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .option:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+            border-color: #ffffff;
+        }
+
+        .option.selected {
+            background-color: #ffffff;
+            color: #0a192f;
+            border-color: #ffffff;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+            color: white;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .input-group select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #0a192f;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .input-group input:focus,
+        .input-group select:focus {
+            outline: none;
+            border-color: #ffffff;
+            box-shadow: 0 0 0 2px rgba(100, 255, 218, 0.2);
+        }
+
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+            gap: 1rem;
+        }
+
+        .nav-button {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            flex: 1;
+            text-align: center;
+        }
+
+        .prev-button {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .next-button {
+            background-color: #ffffff;
+            color: #0a192f;
+        }
+
+        .nav-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            width: 100%;
+            height: 4px;
+            background-color: rgba(255, 255, 255, 0.1);
+            margin-bottom: 2rem;
+            border-radius: 2px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: #ffffff;
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+
+        /* Search Results Styles */
+        .search-results {
+            display: none;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .loading-container {
+            display: none;
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 255, 255, 0.1);
+            border-top-color: #ffffff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .flight-results {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .flight-card {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .flight-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .flight-card h3 {
+            color: #ffffff;
+            margin-bottom: 1rem;
+        }
+
+        .flight-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .flight-detail {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .flight-detail label {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+        }
+
+        .recommendations-section {
+            margin-top: 3rem;
+            padding: 2rem;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .recommendations-section h2 {
+            color: #ffffff;
+            margin-bottom: 1.5rem;
+        }
+
+        .recommendations-content {
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+        
+        .recommendation-card {
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .recommendation-card h3 {
+            color: #ffffff;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+        
+        .recommendation-card .summary {
+            font-style: italic;
+            margin-bottom: 1rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .safety-rating {
+            margin-bottom: 1rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .activities-section, .hotels-section, .travel-tips-section {
+            margin-bottom: 1.5rem;
+        }
+        
+        .activities-section h4, .hotels-section h4, .travel-tips-section h4 {
+            color: #ffffff;
+            margin-bottom: 0.5rem;
+            font-size: 1.2rem;
+        }
+        
+        .activities-section ul, .hotels-section ul, .travel-tips-section ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        
+        .activities-section li, .hotels-section li, .travel-tips-section li {
+            margin-bottom: 0.5rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+        
+        .activities-section li:before, .hotels-section li:before, .travel-tips-section li:before {
+            content: "•";
+            position: absolute;
+            left: 0.5rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .error-message {
+            color: #ff6b6b;
+            text-align: center;
+            margin: 1rem 0;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Welcome Page -->
+    <div class="welcome-page" id="welcomePage">
+        <div class="container">
+            <h1>WanderAI</h1>
+            <p>Let WanderAI craft your perfect travel experience. Our intelligent system will analyze your preferences and curate destinations that match your dreams.</p>
+            <button class="btn" id="startButton">Begin Your Journey</button>
+        </div>
+    </div>
+
+    <!-- Questionnaire -->
+    <div class="questionnaire" id="questionnaire">
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        
+        <div class="question active" id="question1">
+            <h2>How many people are in your party?</h2>
+            <p>Enter the number of travelers</p>
+            <div class="input-group">
+                <input type="number" id="groupSize" min="1" max="20" required>
+            </div>
+        </div>
+
+        <div class="question" id="question2">
+            <h2>What are the ages of your travel party?</h2>
+            <p>Select the age group for each member</p>
+            <div class="input-group" id="ageGroups">
+                <!-- Age groups will be dynamically added here -->
+            </div>
+        </div>
+
+        <div class="question" id="question3">
+            <h2>Where are you traveling from?</h2>
+            <p>Enter your departure city or airport</p>
+            <div class="input-group">
+                <input type="text" id="origin" placeholder="e.g., New York, JFK" required>
+            </div>
+        </div>
+
+        <div class="question" id="question4">
+            <h2>Where would you like to go?</h2>
+            <p>Enter your destination city, country, or region (e.g., Paris, France or East Coast USA)</p>
+            <div class="input-group">
+                <input type="text" id="destination" placeholder="e.g., Paris, France or East Coast USA">
+                <p class="input-hint">You can enter specific cities, countries, or broader regions like:
+                    <br>- East Coast USA
+                    <br>- West Coast USA
+                    <br>- Europe
+                    <br>- Asia
+                    <br>- Australia
+                    <br>- South America
+                    <br>- Africa
+                </p>
+            </div>
+        </div>
+
+        <div class="question" id="question5">
+            <h2>When would you like to travel?</h2>
+            <p>Select your preferred travel period</p>
+            <div class="input-group">
+                <select id="year" required>
+                    <option value="">Select Year</option>
+                    <option value="2025">2025</option>
+                    <option value="2026">2026</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <select id="season">
+                    <option value="">Select Season (Optional)</option>
+                    <option value="spring">Spring</option>
+                    <option value="summer">Summer</option>
+                    <option value="fall">Fall</option>
+                    <option value="winter">Winter</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <select id="month">
+                    <option value="">Select Month (Optional)</option>
+                    <option value="january">January</option>
+                    <option value="february">February</option>
+                    <option value="march">March</option>
+                    <option value="april">April</option>
+                    <option value="may">May</option>
+                    <option value="june">June</option>
+                    <option value="july">July</option>
+                    <option value="august">August</option>
+                    <option value="september">September</option>
+                    <option value="october">October</option>
+                    <option value="november">November</option>
+                    <option value="december">December</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="question" id="question6">
+            <h2>What's your preferred travel style?</h2>
+            <p>Select your preferred level of luxury</p>
+            <div class="options">
+                <div class="option" data-value="budget">Budget</div>
+                <div class="option" data-value="midrange">Mid-Range</div>
+                <div class="option" data-value="luxury">Luxury</div>
+                <div class="option" data-value="ultraluxury">Ultra Luxury</div>
+                <div class="option" data-value="flexible">Flexible</div>
+            </div>
+        </div>
+
+        <div class="question" id="question7">
+            <h2>What type of flight do you prefer?</h2>
+            <p>Select your preferred flight type (multiple selections allowed)</p>
+            <div class="options">
+                <div class="option" data-value="direct">Direct</div>
+                <div class="option" data-value="1connection">1 Connection</div>
+                <div class="option" data-value="multiple">Multiple Connections</div>
+            </div>
+        </div>
+
+        <div class="navigation-buttons">
+            <button class="nav-button prev-button" id="prevButton" disabled>Previous</button>
+            <button class="nav-button next-button" id="nextButton">Next</button>
+        </div>
+    </div>
+
+    <!-- Search Results -->
+    <div class="search-results" id="searchResults">
+        <div class="container">
+            <h1>WanderAI is curating your dream vacation</h1>
+            
+            <div class="loading-container" id="loadingContainer">
+                <div class="loading-spinner"></div>
+                <div class="search-status">Searching for the perfect flights...</div>
+            </div>
+
+            <div class="error-message" id="errorMessage"></div>
+
+            <div class="flight-results" id="flightResults">
+                <!-- Flight results will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Logging utility
+        const logger = {
+            info: (message, data) => {
+                console.log(`%c[INFO] ${message}`, 'color: #ffffff', data || '');
+            },
+            error: (message, error) => {
+                console.error(`%c[ERROR] ${message}`, 'color: #ff6b6b', error || '');
+            },
+            warn: (message, data) => {
+                console.warn(`%c[WARN] ${message}`, 'color: #ffd700', data || '');
+            },
+            debug: (message, data) => {
+                console.debug(`%c[DEBUG] ${message}`, 'color: #3b82f6', data || '');
+            }
+        };
+
+        // State management
+        const state = {
+            currentQuestion: 1,
+            totalQuestions: 7,
+            answers: {},
+            selectedOptions: new Set()
+        };
+
+        // DOM Elements
+        const welcomePage = document.getElementById('welcomePage');
+        const questionnaire = document.getElementById('questionnaire');
+        const searchResults = document.getElementById('searchResults');
+        const startButton = document.getElementById('startButton');
+        const prevButton = document.getElementById('prevButton');
+        const nextButton = document.getElementById('nextButton');
+        const progressBar = document.getElementById('progressBar');
+        const loadingContainer = document.getElementById('loadingContainer');
+        const errorMessage = document.getElementById('errorMessage');
+        const flightResults = document.getElementById('flightResults');
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', () => {
+            logger.info('Application initialized');
+            setupEventListeners();
+            updateQuestionVisibility();
+            setupAgeGroupInputs(); // Initialize age group inputs
+        });
+
+        function setupEventListeners() {
+            startButton.addEventListener('click', startQuestionnaire);
+            prevButton.addEventListener('click', showPreviousQuestion);
+            nextButton.addEventListener('click', showNextQuestion);
+
+            // Add click handlers for option selections
+            document.querySelectorAll('.option').forEach(option => {
+                option.addEventListener('click', () => {
+                    const questionId = option.closest('.question').id;
+                    const isMultiSelect = ['question7'].includes(questionId);
+                    
+                    if (isMultiSelect) {
+                        option.classList.toggle('selected');
+                        updateMultiSelectAnswer(questionId);
+                    } else {
+                        document.querySelectorAll(`#${questionId} .option`).forEach(opt => {
+                            opt.classList.remove('selected');
+                        });
+                        option.classList.add('selected');
+                        updateSingleSelectAnswer(questionId, option.dataset.value);
+                    }
+                    
+                    validateCurrentQuestion();
+                });
+            });
+
+            // Add input handlers for text inputs
+            document.querySelectorAll('input[type="text"]').forEach(input => {
+                input.addEventListener('input', () => {
+                    validateCurrentQuestion();
+                });
+            });
+
+            // Add input handler for group size
+            const groupSizeInput = document.getElementById('groupSize');
+            groupSizeInput.addEventListener('input', () => {
+                const value = parseInt(groupSizeInput.value);
+                if (!isNaN(value) && value > 0 && value <= 20) {
+                    updateAgeGroupVisibility();
+                }
+                validateCurrentQuestion();
+            });
+
+            // Add change handlers for age selects
+            document.querySelectorAll('.age-select').forEach(select => {
+                select.addEventListener('change', () => {
+                    console.log('Age select changed:', select.value);
+                    validateCurrentQuestion();
+                });
+            });
+
+            // Add change handlers for other selects
+            document.querySelectorAll('select:not(.age-select)').forEach(select => {
+                select.addEventListener('change', () => {
+                    validateCurrentQuestion();
+                });
+            });
+        }
+
+        function startQuestionnaire() {
+            logger.info('Questionnaire started');
+            welcomePage.style.display = 'none';
+            questionnaire.style.display = 'block';
+            updateProgress();
+            updateQuestionVisibility(); // Ensure first question is visible
+        }
+
+        function showPreviousQuestion() {
+            if (state.currentQuestion > 1) {
+                state.currentQuestion--;
+                updateQuestionVisibility();
+                updateProgress();
+                validateCurrentQuestion();
+                logger.debug(`Moved to previous question: ${state.currentQuestion}`);
+            }
+        }
+
+        function showNextQuestion() {
+            if (state.currentQuestion < state.totalQuestions) {
+                saveCurrentAnswer();
+                state.currentQuestion++;
+                updateQuestionVisibility();
+                updateProgress();
+                validateCurrentQuestion();
+                logger.debug(`Moved to next question: ${state.currentQuestion}`);
+            } else {
+                completeQuestionnaire();
+            }
+        }
+
+        function updateQuestionVisibility() {
+            const questions = document.querySelectorAll('.question');
+            questions.forEach((question, index) => {
+                if (index + 1 === state.currentQuestion) {
+                    question.classList.add('active');
+                    question.style.display = 'block';
+                } else {
+                    question.classList.remove('active');
+                    question.style.display = 'none';
+                }
+            });
+
+            prevButton.disabled = state.currentQuestion === 1;
+            nextButton.textContent = state.currentQuestion === state.totalQuestions ? 'Complete' : 'Next';
+            nextButton.disabled = !isCurrentQuestionValid();
+        }
+
+        function updateProgress() {
+            const progress = (state.currentQuestion / state.totalQuestions) * 100;
+            progressBar.style.width = `${progress}%`;
+            logger.debug(`Progress updated: ${progress}%`);
+        }
+
+        function setupAgeGroupInputs() {
+            const ageGroups = document.getElementById('ageGroups');
+            const ageRanges = [
+                '0-2 years',
+                '3-12 years',
+                '13-17 years',
+                '18-24 years',
+                '25-34 years',
+                '35-44 years',
+                '45-54 years',
+                '55-64 years',
+                '65+ years'
+            ];
+
+            ageGroups.innerHTML = ageRanges.map((range, index) => `
+                <div class="input-group" style="display: none;">
+                    <label for="age${index + 1}">Traveler ${index + 1}</label>
+                    <select id="age${index + 1}" class="age-select" required>
+                        <option value="">Select Age Group</option>
+                        ${ageRanges.map(r => `<option value="${r}">${r}</option>`).join('')}
+                    </select>
+                </div>
+            `).join('');
+
+            // Add event listeners for age selects
+            document.querySelectorAll('.age-select').forEach(select => {
+                select.addEventListener('change', () => {
+                    console.log('Age select changed:', select.value);
+                    validateCurrentQuestion();
+                });
+            });
+        }
+
+        function updateAgeGroupVisibility() {
+            const groupSize = parseInt(document.getElementById('groupSize').value) || 0;
+            console.log('Updating age group visibility for group size:', groupSize);
+            
+            const ageGroups = document.querySelectorAll('.age-select');
+            ageGroups.forEach((select, index) => {
+                const inputGroup = select.closest('.input-group');
+                if (index < groupSize) {
+                    inputGroup.style.display = 'block';
+                } else {
+                    inputGroup.style.display = 'none';
+                    select.value = '';
+                }
+            });
+            
+            validateCurrentQuestion();
+        }
+
+        function isCurrentQuestionValid() {
+            const currentQuestion = document.getElementById(`question${state.currentQuestion}`);
+            console.log('Validating question:', state.currentQuestion);
+            
+            if (currentQuestion.id === 'question2') {
+                const groupSize = parseInt(document.getElementById('groupSize').value) || 0;
+                const visibleAgeSelects = document.querySelectorAll('.age-select');
+                const selectedAges = Array.from(visibleAgeSelects).filter(select => {
+                    const inputGroup = select.closest('.input-group');
+                    return inputGroup.style.display !== 'none' && select.value !== '';
+                });
+                
+                console.log('Age validation:', {
+                    groupSize,
+                    visibleCount: visibleAgeSelects.length,
+                    selectedCount: selectedAges.length,
+                    selectedAges: selectedAges.map(select => select.value)
+                });
+                
+                return selectedAges.length === groupSize;
+            }
+            
+            const isTextInput = currentQuestion.querySelector('input[type="text"]');
+            const isNumberInput = currentQuestion.querySelector('input[type="number"]');
+            const isSelect = currentQuestion.querySelector('select');
+            const isOptionSelected = currentQuestion.querySelector('.option.selected');
+            
+            if (isNumberInput) {
+                const value = parseInt(isNumberInput.value);
+                console.log('Validating number input:', { value, isValid: !isNaN(value) && value > 0 && value <= 20 });
+                return !isNaN(value) && value > 0 && value <= 20;
+            } else if (isTextInput) {
+                const isValid = isTextInput.id === 'destination' || isTextInput.value.trim() !== '';
+                console.log('Validating text input:', { id: isTextInput.id, value: isTextInput.value, isValid });
+                return isValid;
+            } else if (isSelect) {
+                const requiredSelects = currentQuestion.querySelectorAll('select[required]');
+                const isValid = Array.from(requiredSelects).every(select => select.value !== '');
+                console.log('Validating select:', { 
+                    questionId: currentQuestion.id, 
+                    requiredCount: requiredSelects.length,
+                    isValid 
+                });
+                return isValid;
+            } else if (isOptionSelected) {
+                console.log('Validating option selection:', { 
+                    questionId: currentQuestion.id,
+                    selectedValue: isOptionSelected.dataset.value 
+                });
+                return true;
+            }
+            
+            return false;
+        }
+
+        function validateCurrentQuestion() {
+            const isValid = isCurrentQuestionValid();
+            nextButton.disabled = !isValid;
+            console.log(`Question ${state.currentQuestion} validation:`, { 
+                isValid,
+                questionId: `question${state.currentQuestion}`,
+                nextButtonDisabled: nextButton.disabled
+            });
+        }
+
+        function updateSingleSelectAnswer(questionId, value) {
+            const answerKey = questionId.replace('question', '').toLowerCase();
+            state.answers[answerKey] = value;
+            logger.debug(`Updated answer for ${answerKey}:`, value);
+        }
+
+        function updateMultiSelectAnswer(questionId) {
+            const answerKey = questionId.replace('question', '').toLowerCase();
+            const selectedOptions = Array.from(document.querySelectorAll(`#${questionId} .option.selected`))
+                .map(option => option.dataset.value);
+            state.answers[answerKey] = selectedOptions;
+            logger.debug(`Updated multi-select answer for ${answerKey}:`, selectedOptions);
+        }
+
+        function saveCurrentAnswer() {
+            const currentQuestion = document.getElementById(`question${state.currentQuestion}`);
+            const textInput = currentQuestion.querySelector('input[type="text"]');
+            const numberInput = currentQuestion.querySelector('input[type="number"]');
+            const selects = currentQuestion.querySelectorAll('select');
+            
+            if (numberInput) {
+                state.answers.groupSize = parseInt(numberInput.value);
+                logger.debug('Saved group size:', state.answers.groupSize);
+            } else if (textInput) {
+                if (textInput.id === 'origin') {
+                    state.answers.origin = textInput.value.trim();
+                    logger.debug('Saved origin:', state.answers.origin);
+                } else if (textInput.id === 'destination') {
+                    state.answers.destination = textInput.value.trim();
+                    logger.debug('Saved destination:', state.answers.destination);
+                }
+            } else if (currentQuestion.id === 'question2') {
+                const ageGroups = Array.from(document.querySelectorAll('.age-select:not([style*="display: none"])'))
+                    .map(select => select.value);
+                state.answers.ageGroups = ageGroups;
+                logger.debug('Saved age groups:', ageGroups);
+            } else if (selects.length > 0) {
+                selects.forEach(select => {
+                    if (select.value) {
+                        const key = select.id;
+                        state.answers[key] = select.value;
+                        logger.debug(`Saved ${key}:`, select.value);
+                    }
+                });
+            }
+        }
+
+        function completeQuestionnaire() {
+            logger.info('Questionnaire completed', state.answers);
+            saveCurrentAnswer();
+            localStorage.setItem('wanderAIAnswers', JSON.stringify(state.answers));
+            
+            questionnaire.style.display = 'none';
+            searchResults.style.display = 'block';
+            loadingContainer.style.display = 'block';
+            
+            searchFlights();
+        }
+
+        function showLoading() {
+            loadingContainer.style.display = 'flex';
+            loadingContainer.innerHTML = `
+                <div class="loading-spinner"></div>
+            `;
+        }
+
+        function hideLoading() {
+            loadingContainer.style.display = 'none';
+            loadingContainer.innerHTML = '';
+        }
+
+        async function searchFlights() {
+            try {
+                showLoading();
+                console.log('[Frontend] Sending search request with preferences:', state.answers);
+                
+                const response = await fetch('http://localhost:3000/api/search-flights', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ preferences: state.answers })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Server returned ${response.status}: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                console.log('[Frontend] Received response:', data);
+                displayResults(data.flights, data.recommendations);
+            } catch (error) {
+                console.error('[Frontend] Flight search failed:', error);
+                if (error.message.includes('Failed to fetch') || error.message.includes('Connection refused')) {
+                    throw new Error('Unable to connect to the server. Please make sure the server is running on port 3000.');
+                }
+                showError('The travel recommendation service is currently processing your request. This is a demo version of WanderAI. In a full implementation, this would connect to real travel APIs to find the best options for your trip.');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function displayResults(flights, recommendations) {
+            logger.info('Displaying results', { flights, recommendations });
+            
+            if (!flights || flights.length === 0) {
+                flightResults.innerHTML = `
+                    <div class="demo-message">
+                        <h2>Demo Mode</h2>
+                        <p>This is a demonstration of WanderAI's travel planning capabilities. In a full implementation, this would show:</p>
+                        <ul>
+                            <li>Real-time flight options matching your preferences</li>
+                            <li>Personalized travel recommendations</li>
+                            <li>Hotel and activity suggestions</li>
+                            <li>Price comparisons and booking options</li>
+                        </ul>
+                        <p>Your preferences have been saved and would be used to find the perfect travel options for you.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const flightsHTML = flights.map(flight => `
+                <div class="flight-card">
+                    <h3>${flight.airline} - Flight ${flight.flightNumber}</h3>
+                    <div class="flight-details">
+                        <div class="flight-detail">
+                            <label>Departure</label>
+                            <span>${flight.departure.airport} - ${flight.departure.time}</span>
+                            <span>${flight.departure.date}</span>
+                        </div>
+                        <div class="flight-detail">
+                            <label>Arrival</label>
+                            <span>${flight.arrival.airport} - ${flight.arrival.time}</span>
+                            <span>${flight.arrival.date}</span>
+                        </div>
+                        <div class="flight-detail">
+                            <label>Connections</label>
+                            <span>${flight.connections}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            // Handle recommendations display
+            let recommendationsHTML = '';
+            
+            if (recommendations) {
+                try {
+                    console.log('[Frontend] Processing recommendations:', recommendations);
+                    
+                    // Check if recommendations is a string (needs parsing) or already an object
+                    const recommendationsData = typeof recommendations === 'string' 
+                        ? JSON.parse(recommendations) 
+                        : recommendations;
+                    
+                    // Check if it's an array or a single object
+                    const recommendationsArray = Array.isArray(recommendationsData) 
+                        ? recommendationsData 
+                        : [recommendationsData];
+                    
+                    console.log('[Frontend] Recommendations array:', recommendationsArray);
+                    
+                    recommendationsHTML = `
+                        <div class="recommendations-section">
+                            <h2>Travel Recommendations</h2>
+                            <div class="recommendations-content">
+                                ${recommendationsArray.map(rec => `
+                                    <div class="recommendation-card">
+                                        <h3>${rec.destination || 'Unknown Destination'}</h3>
+                                        <p class="summary">${rec.summary || 'No summary available.'}</p>
+                                        
+                                        <div class="safety-rating">
+                                            <span>Safety Rating: ${rec.safety_rating || 3}/5</span>
+                                        </div>
+                                        
+                                        <div class="activities-section">
+                                            <h4>Recommended Activities</h4>
+                                            <ul>
+                                                ${(rec.activities || [{ name: 'No activities listed', description: 'No description available.' }]).map(activity => `
+                                                    <li>
+                                                        <strong>${activity.name || 'Unnamed Activity'}</strong>: ${activity.description || 'No description available.'}
+                                                    </li>
+                                                `).join('')}
+                                            </ul>
+                                        </div>
+                                        
+                                        <div class="hotels-section">
+                                            <h4>Hotel Options</h4>
+                                            <ul>
+                                                ${(rec.hotels || [{ name: 'No hotels listed', category: 'Unknown' }]).map(hotel => `
+                                                    <li>
+                                                        <strong>${hotel.name || 'Unnamed Hotel'}</strong> (${hotel.category || 'Unknown'})
+                                                    </li>
+                                                `).join('')}
+                                            </ul>
+                                        </div>
+                                        
+                                        <div class="travel-tips-section">
+                                            <h4>Travel Tips</h4>
+                                            <ul>
+                                                ${(rec.travel_tips || ['No travel tips available.']).map(tip => `
+                                                    <li>${tip || 'No tip available.'}</li>
+                                                `).join('')}
+                                            </ul>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                } catch (error) {
+                    console.error('[Frontend] Error displaying recommendations:', error);
+                    recommendationsHTML = `
+                        <div class="recommendations-section">
+                            <h2>Travel Recommendations</h2>
+                            <div class="recommendations-content">
+                                <p>We're having trouble displaying personalized recommendations at the moment. 
+                                Please try again later or contact support if the issue persists.</p>
+                            </div>
+                        </div>
+                    `;
+                }
+            } else {
+                recommendationsHTML = `
+                    <div class="recommendations-section">
+                        <h2>Travel Recommendations</h2>
+                        <div class="recommendations-content">
+                            <p>No recommendations available at this time.</p>
+                        </div>
+                    </div>
+                `;
+            }
+
+            flightResults.innerHTML = flightsHTML + recommendationsHTML;
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('error-message');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 5000);
+        }
+    </script>
+</body>
+</html> 
